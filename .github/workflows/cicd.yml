@@ -41,6 +41,15 @@ jobs:
       - name: Build JAR
         run: mvn clean package -DskipTests
 
+      - name: Debug target directory
+        run: |
+          echo "=== CURRENT DIRECTORY ==="
+          pwd
+          echo "=== FULL PROJECT TREE ==="
+          ls -R
+          echo "=== TARGET CONTENT ==="
+          ls -R target || echo "NO TARGET FOLDER FOUND"
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
