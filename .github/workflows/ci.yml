@@ -1,0 +1,46 @@
+name: Java CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-and-test:
+    name: Build, Test & Security Checks (Java 25)
+    runs-on: ubuntu-latest
+
+    services:
+      # GitHub Actions runners come pre-equipped with Docker, 
+      # so Testcontainers will spin up Postgres dynamically on this host.
+      docker:
+        image: docker:dind
+        options: --privileged
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Java JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build with Maven
+        # clean verify builds the project, runs unit + integration tests (with Testcontainers), 
+        # and runs the JaCoCo coverage verification check (fails if <80% coverage).
+        run: mvn clean verify -B
+
+      - name: Archive Test Results & Code Coverage Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+
+      - name: Dependency Vulnerability Scanning
+        # Run dependency-tree check to audit security and print dependencies
+        run: mvn dependency:tree -B
