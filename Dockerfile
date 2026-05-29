@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN useradd -m appuser
 
-COPY --chown=appuser:appuser target/booking-JP-system-backend-*.jar app.jar
+COPY --chown=appuser:appuser target/*.jar app.jar
 
 USER appuser
 
