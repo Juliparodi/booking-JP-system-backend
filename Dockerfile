@@ -1,5 +1,5 @@
 # Stage 1: Build compilation
-FROM maven:3.9.9-eclipse-temurin-25-alpine AS build
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS build
 WORKDIR /build
 
 # Copy Maven descriptor and fetch offline dependencies to speed up subsequent builds (caching layer)
@@ -11,7 +11,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Stage 2: Minimalist production JRE runtime
-FROM eclipse-temurin:25-jre-alpine
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
 # Create a secure, non-root system user and group
