@@ -38,6 +38,9 @@ jobs:
       - name: Build service with Maven
         run: mvn clean install
 
+      - name: Build JAR
+        run: mvn clean package -DskipTests
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
