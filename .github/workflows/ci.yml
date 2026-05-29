@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-test:
-    name: Build, Test & Security Checks (Java 25)
+    name: Build, Test & Security Checks
     runs-on: ubuntu-latest
 
     services:
