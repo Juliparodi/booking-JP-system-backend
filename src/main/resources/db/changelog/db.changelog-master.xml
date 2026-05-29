@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1.0-create-resources-table" author="booking-system">
+        <createTable tableName="resources">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="1.1-create-bookings-table" author="booking-system">
+        <createTable tableName="bookings">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="resource_id" type="UUID">
+                <constraints nullable="false" referencedTableName="resources" referencedColumnNames="id" foreignKeyName="fk_booking_resource"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cancelled_at" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="1.2-create-indexes" author="booking-system">
+        <!-- Index on resources for rapid FK resolution -->
+        <createIndex indexName="idx_booking_resource_id" tableName="bookings">
+            <column name="resource_id"/>
+        </createIndex>
+
+        <!-- Index on user_id for fetching user bookings quickly -->
+        <createIndex indexName="idx_booking_user_id" tableName="bookings">
+            <column name="user_id"/>
+        </createIndex>
+
+        <!-- Compound index on times for fast overlap searches -->
+        <createIndex indexName="idx_booking_time_overlap" tableName="bookings">
+            <column name="resource_id"/>
+            <column name="start_time"/>
+            <column name="end_time"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
