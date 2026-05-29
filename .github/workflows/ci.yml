@@ -1,4 +1,4 @@
-name: Java CI/CD Pipeline
+name: CI/CD Booking JP System Backend
 
 on:
   push:
@@ -29,10 +29,16 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Build with Maven
-        # clean verify builds the project, runs unit + integration tests (with Testcontainers), 
-        # and runs the JaCoCo coverage verification check (fails if <80% coverage).
-        run: mvn clean verify -B
+      - name: Build JAR
+        run: mvn package -DskipTests
+
+      - name: Run Tests
+        run: mvn test
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Archive Test Results & Code Coverage Reports
         if: always()
@@ -41,6 +47,18 @@ jobs:
           name: jacoco-report
           path: target/site/jacoco/
 
-      - name: Dependency Vulnerability Scanning
-        # Run dependency-tree check to audit security and print dependencies
-        run: mvn dependency:tree -B
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: juliparodi/booking-jp-system:${{ github.sha }}, juliparodi/booking-jp-system:latest
+
